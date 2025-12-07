@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
+import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
 
 import { Trip } from '../models/trip';
 import { TripData } from '../services/trip-data';
 import { TripCard } from '../trip-card/trip-card';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-trip-listing',
   standalone: true,
-  imports: [NgFor, TripCard],
+  imports: [CommonModule, NgFor, TripCard],
   templateUrl: './trip-listing.html',
   styleUrl: './trip-listing.css',
   providers: [TripData],
@@ -18,7 +19,7 @@ export class TripListing implements OnInit {
   trips: Trip[] = [];
   message: string = '';
 
-  constructor(private tripData: TripData, private router: Router) {
+  constructor(private tripData: TripData, private router: Router, private cdr: ChangeDetectorRef) {
     console.log('trip-listing constructor');
   }
 
@@ -30,6 +31,7 @@ export class TripListing implements OnInit {
     this.tripData.getTrips().subscribe({
       next: (value: any) => {
         this.trips = value;
+        this.cdr.detectChanges();
 
         if (value.length > 0) {
           this.message = 'There are ' + value.length + ' trips available.';
