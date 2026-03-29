@@ -61,6 +61,21 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/travel', travelRouter);
 app.use('/api', apiRouter);
+app.use('/api', (err, req, res, next) => {
+  console.error(err);
+
+  if (err.name === "ValidationError") {
+    return res.status(400).json({
+      message: "Database validation failed.",
+      error: err.message
+    });
+  }
+
+  return res.status(500).json({
+    message: "Server error."
+  });
+
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
