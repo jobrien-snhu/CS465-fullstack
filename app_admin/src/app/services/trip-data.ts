@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { Trip } from '../models/trip';
@@ -11,10 +11,21 @@ import { BROWSER_STORAGE } from '../storage';
   providedIn: 'root',
 })
 export class TripData {
-  constructor(private http: HttpClient, @Inject(BROWSER_STORAGE) private storage: Storage) {}
+  constructor(
+    private http: HttpClient,
+    @Inject(BROWSER_STORAGE) private storage: Storage,
+  ) {}
 
   url = 'http://localhost:3000/api/trips';
   baseUrl = 'http://localhost:3000/api';
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.storage.getItem('travlr-token');
+
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
 
   // GET all trips
   getTrips(): Observable<Trip[]> {
@@ -34,6 +45,10 @@ export class TripData {
   updateTrip(formData: Trip): Observable<Trip> {
     // console.log('Inside TripDataService::addTrips');
     return this.http.put<Trip>(this.url + '/' + formData.code, formData);
+  }
+
+  deleteTrip(tripCode: string): Observable<any> {
+    return this.http.delete(this.url + '/' + tripCode, { headers: this.getAuthHeaders() });
   }
 
   // Call to our /login endpoint, returns JWT

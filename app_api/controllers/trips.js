@@ -94,11 +94,42 @@ const tripsUpdateTrip = async (req, res, next) => {
     }
 };
 
+// DELETE one trip by tripCode
+const tripsDeleteTrip = async (req, res) => {
+  const { tripCode } = req.params;
+
+  if (!tripCode) {
+    return res
+      .status(400)
+      .json({ message: 'tripCode is required' });
+  }
+
+  try {
+    const deletedTrip = await Trip.findOneAndDelete({ code: tripCode });
+
+    if (!deletedTrip) {
+      return res
+        .status(404)
+        .json({ message: 'Trip not found' });
+    }
+
+    return res
+      .status(200)
+      .json({ message: 'Trip deleted successfully' });
+  } catch (err) {
+    return res
+      .status(500)
+      .json(err);
+  }
+};
+
+
 
 
 module.exports = {
     tripsList,
     tripsFindByCode,
     tripsAddTrip,
-    tripsUpdateTrip
+    tripsUpdateTrip,
+    tripsDeleteTrip
 };
